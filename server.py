@@ -1,37 +1,36 @@
 import socket
-import random
-import pickle
-server_name = "Server of Abhir Karande"
-server_port = 6000 # choose a port number greater than 1023
+import os
 
-# create a socket
-server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+HOST, PORT = '', 6789
 
-# bind the socket to the server address and port
-server_socket.bind(("127.0.0.1", server_port))
+def start_server():
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server_socket:
+        server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        server_socket.bind((HOST, PORT))
+        server_socket.listen(1)
+        print(f'Serving HTTP on port {PORT} ...')
 
-# listen for incoming connections
-server_socket.listen(1)
+        while True:
+            client_connection, client_address = server_socket.accept()
+            request = client_connection.recv(1024).decode()
+            print(f'Request: {request}')
 
+            request_lines = request.split('\n')
+            request_line = request_lines[0]
+            filename = request_line.split()[1]
+            filename = filename.split('/')[-1]
+            print(f'Filename: {filename}')
 
-while True:
-    # accept a connection from a client
-    client_socket, client_address = server_socket.accept()
-    
-    
-    # receive data from the client
-    client_name, client_number = pickle.loads(client_socket.recv(1024))
-    print("The server of ", server_name, " is communicating with ", client_name)
-    client_number = int(client_number)
-    
-    if client_number > 100 or client_number < 1:
-        print("Invalid client number. Terminating server.")
-        server_socket.close()
-        break
-        
-    # pick a random number between 1 and 100
-    server_number = random.randint(1, 100)
+            if not os.path.exists(filename):
+                response = 'HTTP/1.1 404 Not Found\n\n'
+                response += '<html><head></head><body><h1>404 Not Found</h1></body></html>'
+            else:
+                with open(filename, 'r') as file:
+                    response = 'HTTP/1.1 200 OK\n\n'
+                    response += file.read()
 
-    server_data = pickle.dumps([server_name, server_number])    
-    client_socket.send(server_data)
-    client_socket.close()
+            client_connection.sendall(response.encode())
+            client_connection.close()
+
+if __name__ == '__main__':
+    start_server()
