@@ -59,6 +59,8 @@ class AnswerSection:
                         
         """
         #TODO: Student impment this method
+        return Util.binaryStringToHex(self.binaryString[16:32]) 
+
         
 
     def get_CLASS(self) -> int:
@@ -67,6 +69,7 @@ class AnswerSection:
                         RDATA field.
         """
         #TODO: Student impment this method
+        return Util.binaryStringToHex(self.binaryString[32:48])
 
 
     def get_TTL(self):
@@ -78,6 +81,7 @@ class AnswerSection:
                             transaction in progress, and should not be cached.
         """
         #TODO: Student impment this method
+        return Util.binaryStringToHex(self.binaryString[48:80])
 
 
     def get_RDLENGTH(self):
@@ -85,12 +89,14 @@ class AnswerSection:
                         octets of the RDATA field.
                         """
         #TODO: Student impment this method
+        return Util.binaryStringToHex(self.binaryString[80:96])
 
     def set_RDLENGTH(self, _RDLENGTH):
         """
             Function takes an int and sets the lenght value for RD_DATA
         """
         #TODO: Student impment this method
+        self.binaryString = self.binaryString[0:80] + Util.intToBinaryString(_RDLENGTH, 16) + self.binaryString[96:]
 
     def get_RDATA(self)-> str:
         """
@@ -102,12 +108,17 @@ class AnswerSection:
         For this assignment only have to support (Type AAAA with CLASS: IN)  and Type: A with ClASS: IN
         """
         #TODO: Student impment this method
+        if(self.get_TYPE() == "0001" and self.get_CLASS() == "0001"):
+            return Util.binaryStringToHex(self.binaryString[96:128])
+        elif(self.get_TYPE() == "001c" and self.get_CLASS() == "0001"):
+            return Util.binaryStringToHex(self.binaryString[96:160])
 
     
         return "None"
 
     def set_RDATA(self, _ip_address):
         #TODO: Student impment this method
+        self.binaryString = self.binaryString[0:96] + Util.ipToBinaryString(_ip_address) + self.binaryString[128:]
 
         pass
 
@@ -132,10 +143,10 @@ class AnswerSection:
         return Util.binaryStringToHex(self.binaryString)
 
 class AnswerParsingManager:
-   
+
     @staticmethod
     def extractAnswerObjects(_binaryString, _answer_count):
-         """
+            """
         Simular to question Parsing Manager the answer parsing manager class is responsible for parsing section all answer sections
         Creating a AnswerSection Array and the index of the bit representing where the next section begins. 
 
@@ -143,4 +154,11 @@ class AnswerParsingManager:
             A tuple of the form 
                 (Array_of_Answers, base ) 
         """
+        answerArray = []
+        base = 0
+        for i in range(_answer_count):
+            answerArray.append(AnswerSection(_binaryString[base:base+128]))
+            base += 128
+        return (answerArray, base)
+
            
