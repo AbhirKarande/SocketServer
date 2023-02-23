@@ -57,8 +57,20 @@ class Util:
 
     @staticmethod
     def binaryToAsciiQNAME(_input_binary):
-       #TODO: Implement QNAME 
-       pass
+        resultingString = ''
+        i = 0
+        length_of_input = len(_input_binary)
+        while i < length_of_input:
+            label_length = int(_input_binary[i:i+8], 2)
+            if label_length == 0:
+                # end of QNAME
+                resultingString += '.'
+                break
+            i += 8
+            resultingString += ''.join(chr(int(_input_binary[i+j:i+j+8], 2)) for j in range(0, label_length*8, 8)) + '.'
+            i += label_length*8
+        return resultingString
+
 
 
     @staticmethod
@@ -73,7 +85,7 @@ class Util:
         elif _ip_version == 6: 
             ip_address = 'Needs to Be Implemented'
             return ip_address
-            #TODO: Student Add support for parsing IP_Version 6
+            #TODO: Student Add support for parsing IP_Version 
         else: 
             raise Exception('unknow versino passed to Util.binaryToIpAddress only supports 4 & 6 but got '+ _ip_version)
 

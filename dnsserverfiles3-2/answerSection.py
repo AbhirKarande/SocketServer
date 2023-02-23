@@ -142,11 +142,13 @@ class AnswerSection:
          """ 
         return Util.binaryStringToHex(self.binaryString)
 
+
+
 class AnswerParsingManager:
 
     @staticmethod
     def extractAnswerObjects(_binaryString, _answer_count):
-            """
+        """
         Simular to question Parsing Manager the answer parsing manager class is responsible for parsing section all answer sections
         Creating a AnswerSection Array and the index of the bit representing where the next section begins. 
 
@@ -159,6 +161,4 @@ class AnswerParsingManager:
         for i in range(_answer_count):
             answerArray.append(AnswerSection(_binaryString[base:base+128]))
             base += 128
-        return (answerArray, base)
-
-           
+        return (answerArray, base)           
