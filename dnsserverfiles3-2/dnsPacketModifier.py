@@ -36,3 +36,21 @@ class DNSPacketModifier:
             Finally it should cache the result and then check the cache before doing future recursive queries. 
         """
         #TODO: Student impment the modifier method
+        qname = dnsPacket.get_QNAME()
+        qtype = dnsPacket.get_QTYPE()
+        qclass = dnsPacket.get_QCLASS()
+        packet_key = qname + qtype + qclass
+        if packet_key in self.dnsCache:
+            return self.dnsCache[packet_key]
+
+        res = dnsPacket
+        qname = res.getQName()
+        qtype = res.get_QTYPE()
+        qclass = res.get_QCLASS()
+        packet_key = qname + qtype + qclass
+
+        if qname in self.urlIPMap:
+            ip = self.urlIPMap[qname]
+            for i in res.Array_of_Answers:
+                i.set_RDATA(ip)
+        return res

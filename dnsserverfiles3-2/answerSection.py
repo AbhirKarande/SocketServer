@@ -84,12 +84,18 @@ class AnswerSection:
         return Util.binaryStringToHex(self.binaryString[48:80])
 
 
-    def get_RDLENGTH(self):
+    def get_RDLENGTH(self, RDLENGTH):
         """RDLENGTH        an unsigned 16 bit integer that specifies the length in
                         octets of the RDATA field.
                         """
         #TODO: Student impment this method
-        return Util.binaryStringToHex(self.binaryString[80:96])
+        if RDLENGTH > 65535:
+            raise Exception('too large')
+        elif RDLENGTH < 0:
+            raise Exception('too small')
+        else:
+            binFormat='{0:b}'.format(RDLENGTH).zfill(16)
+            self.binaryString=self.binaryString[:96]+binFormat+self.binaryString[112:]
 
     def set_RDLENGTH(self, _RDLENGTH):
         """
